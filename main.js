@@ -25,10 +25,10 @@ function setCanvasSize() {
 }
 
 function startGame() {
-    elementSize = (canvasSize/10) - 1;
+    elementSize = (canvasSize/10.7) - 1;
 
-    context.font = elementSize + 'px Roboto';
-    context.textAlign = "end";
+    context.font = elementSize + 'px Verdana';
+    context.textAlign = "center";
 
     const map = maps[0];
     const mapRows = map.trim().split("\n");
@@ -68,17 +68,17 @@ function movePlayer() {
 }
 
 function playerLimits() {
-    if (playerPosition.x < 36.28) {
-        playerPosition.x = 36.28;
+    if (playerPosition.x < elementSize) {
+        playerPosition.x = elementSize;
     } 
-    if (playerPosition.x > 362.807) {
-        playerPosition.x = 362.807;
+    if (playerPosition.x > elementSize*10) {
+        playerPosition.x = elementSize*10;
     }
-    if (playerPosition.y < 36.28) {
-        playerPosition.y = 36.28;
+    if (playerPosition.y < elementSize) {
+        playerPosition.y = elementSize;
     }
-    if (playerPosition.y > 362.795) {
-        playerPosition.y = 362.795;
+    if (playerPosition.y > elementSize*10) {
+        playerPosition.y = elementSize*10;
     }
 }
 
