@@ -3,11 +3,19 @@ const context = canvas.getContext('2d');
 
 let canvasSize;
 let elementSize;
+let level = 0;
 
 const playerPosition = {
     x: undefined,
     y: undefined,
 }
+
+const giftPosition = {
+    x: undefined,
+    y: undefined,
+}
+
+let bombs = [];
 
 window.addEventListener('load', setCanvasSize);
 
@@ -30,31 +38,45 @@ function startGame() {
     context.font = elementSize + 'px Verdana';
     context.textAlign = "center";
 
-    const map = maps[0];
+    const map = maps[level];
+    
+    if (!map) {
+        gameWin();
+        return;
+    }
+
     const mapRows = map.trim().split("\n");
     const mapRowCols = mapRows.map(row => row.trim().split(''));
     // console.log(mapRowCols);
 
+    bombs = [];
     context.clearRect(0,0, canvasSize, canvasSize);
 
     mapRowCols.forEach((row, rowIndex) => {
         row.forEach((col, colIndex) => {
             const emoji = emojis[col];
-            const positionX = (elementSize*(rowIndex + 1));
-            const positionY = (elementSize*(colIndex +1));
+            const positionX = (elementSize*(colIndex + 1));
+            const positionY = (elementSize*(rowIndex +1));
 
             playerLimits();
 
             if (playerPosition.x == undefined && col == 'O'){
                 playerPosition.x = positionX;
                 playerPosition.y = positionY;
+            } else if (col == 'I') {
+                giftPosition.x = positionX;
+                giftPosition.y = positionY;
+            } else if (col == 'X') {
+                bombs.push({//le hacemos push a un objeto con las posiciónes en x y y
+                    x: positionX,
+                    y: positionY,
+                })
             }
-
             context.fillText(emoji, positionX, positionY);
         })
     });
     movePlayer();
-    console.log(playerPosition);
+    // console.log(bombs);
     // context.fillRect(0,0,100,100);
     // context.clearRect(0,0,50,50);
     // context.fillStyle = 'orangered';
@@ -64,6 +86,37 @@ function startGame() {
 }
 
 function movePlayer() {
+    const giftCollisionX = playerPosition.x.toFixed(3) == giftPosition.x.toFixed(3);
+    const giftCollisionY = playerPosition.y.toFixed(3) == giftPosition.y.toFixed(3);
+    const giftCollision = giftCollisionX && giftCollisionY;
+
+    if(giftCollision) {
+        nextLevel();
+        console.log('jala');
+    }
+    
+    // for (let i = 0; i < bombs.length; i++) {
+    //     const bombCollisionX = playerPosition.x.toFixed(5) == bombs[i].x.toFixed(5);
+    //     const bombCollisionY = playerPosition.y.toFixed(5) == bombs[i].y.toFixed(5);
+    //     // console.log(bombCollisionX);
+    //     // console.log(bombCollisionY);
+    //     const bombCollision = bombCollisionX && bombCollisionY;
+
+    //     if(bombCollision) {
+    //         console.log('CAGASTE!')
+    //     }
+    // }
+
+    const bombCollision = bombs.find(bomb => {
+        const bombCollisionX = bomb.x.toFixed(3) == playerPosition.x.toFixed(3);
+        const bombCollisionY = bomb.y.toFixed(3) == playerPosition.y.toFixed(3);
+        return bombCollisionX && bombCollisionY;
+    })
+
+    if(bombCollision) {
+        explosion();
+    }
+
     context.fillText(emojis['PLAYER'], playerPosition.x, playerPosition.y);
 }
 
@@ -130,6 +183,22 @@ function gameplay() {
         startGame();
     }
 }
-
 gameplay();
 
+function explosion() {
+    context.fillText(emojis['BOMB_COLLISION'], playerPosition.x, playerPosition.y);
+    playerPosition.x = undefined;
+    playerPosition.y = undefined;
+    setTimeout(startGame, 300);
+    console.log('çhocaste');
+}
+
+function nextLevel() {
+    console.log('Subiste de nivel')
+    level++;
+    startGame();
+}
+
+function gameWin() {
+    console.log('acabaste el juego')
+}
