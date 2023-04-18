@@ -1,9 +1,15 @@
 const canvas = document.querySelector('#game');
 const context = canvas.getContext('2d');
+const spanLives = document.querySelector('#lives');
+const spanTime = document.querySelector('#time');
 
 let canvasSize;
 let elementSize;
 let level = 0;
+let lives = 3;
+let timeStart;
+let timePlayer;
+let timeInterval;
 
 const playerPosition = {
     x: undefined,
@@ -45,9 +51,16 @@ function startGame() {
         return;
     }
 
+    if (!timeStart) {
+        timeStart = Date.now();
+        timeInterval = setInterval(showTime, 100);
+    }
+
     const mapRows = map.trim().split("\n");
     const mapRowCols = mapRows.map(row => row.trim().split(''));
     // console.log(mapRowCols);
+
+    showLives();
 
     bombs = [];
     context.clearRect(0,0, canvasSize, canvasSize);
@@ -186,11 +199,20 @@ function gameplay() {
 gameplay();
 
 function explosion() {
+    spanLives.innerHTML = emojis['HEART'];
+
+    lives --;
+    if (lives <= 0) {
+        level = 0;
+        lives = 3;
+        timeStart = undefined;
+    }
     context.fillText(emojis['BOMB_COLLISION'], playerPosition.x, playerPosition.y);
     playerPosition.x = undefined;
     playerPosition.y = undefined;
-    setTimeout(startGame, 300);
-    console.log('çhocaste');
+    // startGame()
+    setTimeout(startGame, 100);
+    console.log('çhocaste'); 
 }
 
 function nextLevel() {
@@ -200,5 +222,14 @@ function nextLevel() {
 }
 
 function gameWin() {
-    console.log('acabaste el juego')
+    console.log('acabaste el juego');
+    clearInterval(timeInterval);
+}
+
+function showLives() {
+    spanLives.innerHTML = emojis['HEART'].repeat(lives);
+}
+
+function showTime() {
+    spanTime.innerHTML = Date.now() - timeStart;
 }
