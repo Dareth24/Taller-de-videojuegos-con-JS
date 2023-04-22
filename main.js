@@ -2,6 +2,8 @@ const canvas = document.querySelector('#game');
 const context = canvas.getContext('2d');
 const spanLives = document.querySelector('#lives');
 const spanTime = document.querySelector('#time');
+const spanRecord = document.querySelector('#record');
+const pResult = document.querySelector('#result');
 
 let canvasSize;
 let elementSize;
@@ -10,6 +12,8 @@ let lives = 3;
 let timeStart;
 let timePlayer;
 let timeInterval;
+let timeMatch;
+let timeRecord = localStorage.getItem('timeRecordSaved');;
 
 const playerPosition = {
     x: undefined,
@@ -35,6 +39,10 @@ function setCanvasSize() {
     }
     canvas.setAttribute('width', canvasSize);
     canvas.setAttribute('height', canvasSize);
+
+    playerPosition.x = undefined;
+    playerPosition.y = undefined;
+
     startGame();
 }
 
@@ -54,6 +62,7 @@ function startGame() {
     if (!timeStart) {
         timeStart = Date.now();
         timeInterval = setInterval(showTime, 100);
+        showRecord();
     }
 
     const mapRows = map.trim().split("\n");
@@ -224,6 +233,21 @@ function nextLevel() {
 function gameWin() {
     console.log('acabaste el juego');
     clearInterval(timeInterval);
+
+    if (timeRecord = undefined) {
+        timeRecord = timeMatch;
+        localStorage.setItem('timeRecordSaved', timeRecord);
+    }
+
+    timeRecord = localStorage.getItem('timeRecordSaved');
+
+    if (timeMatch < timeRecord) {
+        timeRecord = timeMatch;
+        localStorage.setItem('timeRecordSaved', timeRecord);
+        pResult.innerHTML = 'Superaste el record!';
+    } else {
+        pResult.innerHTML = 'No lograste superar el record, sigue intentando!';
+    }
 }
 
 function showLives() {
@@ -231,5 +255,10 @@ function showLives() {
 }
 
 function showTime() {
-    spanTime.innerHTML = Date.now() - timeStart;
+    timeMatch = Date.now() - timeStart;
+    spanTime.innerHTML = timeMatch;
+}
+
+function showRecord() {
+    spanRecord.innerHTML = timeRecord;
 }
